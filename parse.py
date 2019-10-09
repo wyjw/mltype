@@ -1,6 +1,7 @@
 import argparse
 import os
 import altered_dis
+import torch
 
 class ByteParser:
     def __init__(self):
