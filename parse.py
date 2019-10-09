@@ -6,6 +6,7 @@ class ByteParser:
     def __init__(self):
         type = 'pyc'
         self.dataset = []
+        self.function_split = {}
 
     def parse_instrs(self, list_of_instrs):
         #for i in list_of_instrs:
@@ -19,7 +20,20 @@ class ByteParser:
             temp_dict['offset'] = i.offset
             temp_dict['starts_line'] = i.starts_line
             temp_dict['is_jump_target'] = i.is_jump_target
-        pass
+            self.dataset.append(temp_dict)
+
+    def breakdown_by_func(self):
+        if len(self.dataset) == 0:
+            pass
+        fun = ''
+        for i in self.dataset:
+            if 'code object' in i['argrepr']:
+                fun = i['argrepr'].split('code object')[1].split(' ')[1]
+            if fun not in self.function_split:
+                self.function_split[fun] = []
+            self.function_split[fun].append(i['opname'])
+        print(self.function_split)
+
 
 if __name__ == "__main__":
     curr_dir = os.getcwd()
@@ -34,3 +48,7 @@ if __name__ == "__main__":
 
     byteP = ByteParser()
     byteP.parse_instrs(list(altered_dis.get_instructions(code)))
+    byteP.breakdown_by_func()
+
+result = subprocess.run(['python', args.infile + ".out"], stdout = subprocess.PIPE)
+output = result.stdout
